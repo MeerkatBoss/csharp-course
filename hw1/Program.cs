@@ -1,5 +1,7 @@
 using System.Text;
 
+// We don't know about classes yet, so global variables shall suffice
+
 int parseIndex = 0;
 uint lineNumber = 1;
 uint charNumber = 1;
@@ -81,41 +83,20 @@ long skipWhitespace()
   return parseIndex;
 }
 
-(bool, long) parseInt()
+bool isAtEnd()
 {
-  long result = 0;
-
-  while (hasChar())
-  {
-    char ch = advanceChar();
-    if (!char.IsDigit(ch))
-    {
-      Console.WriteLine(
-        string.Format(
-          "Error at {0}: Expected an integer but found '{1}'", lastPosition(), lastChar()
-        )
-      );
-      return (false, 0);
-    }
-    result = result * 10 + (ch - '0');
-  }
-  return (true, result);
+  return !hasChar() || peekChar() == '=';
 }
 
-(bool, long) parseExpression()
+bool parseEnd()
 {
   skipWhitespace();
-  (bool success, long value) = parseInt();
-  if (!success) return (false, 0);
-
-  skipWhitespace();
-
   if (hasChar())
   {
     char ch = advanceChar();
     if (ch == '=')
     {
-      return (true, value);
+      return true;
     }
 
     Console.WriteLine(
@@ -124,7 +105,7 @@ long skipWhitespace()
       )
     );
 
-    return (false, 0);
+    return false;
   }
 
   Console.WriteLine(
@@ -132,7 +113,64 @@ long skipWhitespace()
       "Error at {0}: Expression must end with '='", currentPosition()
     )
   );
-  return (false, 0);
+
+  return false;
+}
+
+// Without exceptions we have to use Go-style error handling, returning a pair of (success, value)
+(bool, long) parseInt()
+{
+  long result = 0;
+
+  if (!char.IsDigit(peekChar()))
+  {
+    Console.WriteLine(
+      string.Format(
+        "Error at {0}: Expected an integer but found '{1}'", currentPosition(), peekChar()
+      )
+    );
+    return (false, 0);
+  }
+
+  while (hasChar() && char.IsDigit(peekChar()))
+  {
+    char ch = advanceChar();
+    result = result * 10 + (ch - '0');
+  }
+  return (true, result);
+}
+
+(bool, long) parseExpression()
+{
+  (bool success, long value) = parseInt();
+  if (!success)
+    return (false, 0);
+
+  while (hasChar())
+  {
+    skipWhitespace();
+    long sign = peekChar() switch
+    {
+      '+' => 1,
+      '-' => -1,
+      _ => 0
+    };
+
+    if (sign == 0)
+    {
+      return (true, value);
+    }
+
+    advanceChar();
+    skipWhitespace();
+    (success, long nextValue) = parseInt();
+    if (!success)
+      return (false, 0);
+    
+    value += sign * nextValue;
+  }
+
+  return (true, value);
 }
 
 void evaluate(string expression)
@@ -141,7 +179,7 @@ void evaluate(string expression)
 
   (bool success, long value) = parseExpression();
 
-  if (success)
+  if (success && parseEnd())
   {
     Console.WriteLine(value);
   }
