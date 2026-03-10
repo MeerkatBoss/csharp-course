@@ -223,7 +223,7 @@ bool parseEnd()
 
 (bool, float) parseTerm()
 {
-  (bool success, float value) = parseNumber();
+  (bool success, float value) = parseGroup();
   if (!success)
     return (false, 0);
   
@@ -240,7 +240,7 @@ bool parseEnd()
 
     advanceChar();
     skipWhitespace();
-    (success, float nextValue) = parseNumber();
+    (success, float nextValue) = parseGroup();
     if (!success)
       return (false, 0);
     
@@ -266,3 +266,30 @@ bool parseEnd()
   return (true, value);
 }
 
+(bool, float) parseGroup()
+{
+  skipWhitespace();
+  if (peekChar() == '(')
+  {
+    advanceChar();
+    (bool success, float value) = parseExpression();
+    if (!success)
+      return (false, 0);
+    
+    skipWhitespace();
+    if (peekChar() == ')')
+    {
+      advanceChar();
+      return (true, value);
+    }
+
+    Console.WriteLine(
+      string.Format(
+        "Error at {0}: Expected ')' but found '{1}'", currentPosition(), peekChar()
+      )
+    );
+    return (false, 0);
+  }
+
+  return parseNumber();
+}
