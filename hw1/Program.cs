@@ -7,6 +7,58 @@ uint lineNumber = 1;
 uint charNumber = 1;
 string text = "";
 
+// Main loop
+{
+  StringBuilder builder = new();
+  string? line;
+
+  while ((line = Console.ReadLine()) != null)
+  {
+    builder.Append(line);
+    builder.Append(Environment.NewLine);
+    if (builder.Length == 0) continue;
+
+    if (isExpressionReady(builder))
+    {
+      evaluate(builder.ToString());
+      builder.Clear();
+    }
+  }
+
+  Console.WriteLine(builder.ToString());
+}
+
+void evaluate(string expression)
+{
+  text = expression;
+
+  // Without exceptions we have to use Go-style error handling, returning a pair of (success, value)
+  (bool success, long value) = parseExpression();
+
+  if (success && parseEnd())
+  {
+    Console.WriteLine(value);
+  }
+
+  reset();
+}
+
+bool isExpressionReady(StringBuilder builder)
+{
+  for (int i = builder.Length - 1; i >= 0; --i)
+  {
+    if (builder[i] == '=')
+    {
+      return true;
+    }
+    else if (!char.IsWhiteSpace(builder[i]))
+    {
+      return false;
+    }
+  }
+  return false;
+}
+
 void reset()
 {
   parseIndex = 0;
@@ -59,15 +111,6 @@ char advanceChar()
   return '\0';
 }
 
-char lastChar()
-{
-  if (parseIndex > 0)
-  {
-    return text[parseIndex - 1];
-  }
-  return '\0';
-}
-
 long skipWhitespace()
 {
   while (hasChar() && char.IsWhiteSpace(peekChar()))
@@ -81,11 +124,6 @@ long skipWhitespace()
 
   }
   return parseIndex;
-}
-
-bool isAtEnd()
-{
-  return !hasChar() || peekChar() == '=';
 }
 
 bool parseEnd()
@@ -117,7 +155,6 @@ bool parseEnd()
   return false;
 }
 
-// Without exceptions we have to use Go-style error handling, returning a pair of (success, value)
 (bool, long) parseInt()
 {
   long result = 0;
@@ -172,51 +209,3 @@ bool parseEnd()
 
   return (true, value);
 }
-
-void evaluate(string expression)
-{
-  text = expression;
-
-  (bool success, long value) = parseExpression();
-
-  if (success && parseEnd())
-  {
-    Console.WriteLine(value);
-  }
-
-  reset();
-}
-
-bool isExpressionReady(StringBuilder builder)
-{
-  for (int i = builder.Length - 1; i >= 0; --i)
-  {
-    if (builder[i] == '=')
-    {
-      return true;
-    }
-    else if (!char.IsWhiteSpace(builder[i]))
-    {
-      return false;
-    }
-  }
-  return false;
-}
-
-StringBuilder builder = new();
-string? line;
-
-while ((line = Console.ReadLine()) != null)
-{
-  builder.Append(line);
-  builder.Append(Environment.NewLine);
-  if (builder.Length == 0) continue;
-
-  if (isExpressionReady(builder))
-  {
-    evaluate(builder.ToString());
-    builder.Clear();
-  }
-}
-
-Console.WriteLine(builder.ToString());
