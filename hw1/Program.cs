@@ -33,7 +33,7 @@ void evaluate(string expression)
   text = expression;
 
   // Without exceptions we have to use Go-style error handling, returning a pair of (success, value)
-  (bool success, long value) = parseExpression();
+  (bool success, float value) = parseExpression();
 
   if (success && parseEnd())
   {
@@ -155,31 +155,42 @@ bool parseEnd()
   return false;
 }
 
-(bool, long) parseInt()
+(bool, float) parseNumber()
 {
-  long result = 0;
-
-  if (!char.IsDigit(peekChar()))
+  int startIndex = parseIndex;
+  while (hasChar())
+  {
+    char ch = peekChar();
+    if (char.IsDigit(ch) || ch == '.')
+    {
+      advanceChar();
+    }
+    else
+    {
+      break;
+    }
+  }
+  int endIndex = parseIndex;
+  if (startIndex == endIndex)
   {
     Console.WriteLine(
       string.Format(
-        "Error at {0}: Expected an integer but found '{1}'", currentPosition(), peekChar()
+        "Error at {0}: Expected a number but found '{1}'", currentPosition(), peekChar()
       )
     );
     return (false, 0);
   }
 
-  while (hasChar() && char.IsDigit(peekChar()))
-  {
-    char ch = advanceChar();
-    result = result * 10 + (ch - '0');
-  }
-  return (true, result);
+  int length = endIndex - startIndex;
+  var substring = text.AsSpan().Slice(startIndex, length);
+
+  bool success = float.TryParse(substring, out float value);
+  return (success, value);
 }
 
-(bool, long) parseExpression()
+(bool, float) parseExpression()
 {
-  (bool success, long value) = parseTerm();
+  (bool success, float value) = parseTerm();
   if (!success)
     return (false, 0);
 
@@ -200,7 +211,7 @@ bool parseEnd()
 
     advanceChar();
     skipWhitespace();
-    (success, long nextValue) = parseTerm();
+    (success, float nextValue) = parseTerm();
     if (!success)
       return (false, 0);
     
@@ -210,9 +221,9 @@ bool parseEnd()
   return (true, value);
 }
 
-(bool, long) parseTerm()
+(bool, float) parseTerm()
 {
-  (bool success, long value) = parseInt();
+  (bool success, float value) = parseNumber();
   if (!success)
     return (false, 0);
   
@@ -229,7 +240,7 @@ bool parseEnd()
 
     advanceChar();
     skipWhitespace();
-    (success, long nextValue) = parseInt();
+    (success, float nextValue) = parseNumber();
     if (!success)
       return (false, 0);
     
