@@ -179,7 +179,7 @@ bool parseEnd()
 
 (bool, long) parseExpression()
 {
-  (bool success, long value) = parseInt();
+  (bool success, long value) = parseTerm();
   if (!success)
     return (false, 0);
 
@@ -200,7 +200,7 @@ bool parseEnd()
 
     advanceChar();
     skipWhitespace();
-    (success, long nextValue) = parseInt();
+    (success, long nextValue) = parseTerm();
     if (!success)
       return (false, 0);
     
@@ -209,3 +209,49 @@ bool parseEnd()
 
   return (true, value);
 }
+
+(bool, long) parseTerm()
+{
+  (bool success, long value) = parseInt();
+  if (!success)
+    return (false, 0);
+  
+  while (hasChar())
+  {
+    skipWhitespace();
+    char op = peekChar();
+    string opPosition = currentPosition();
+
+    if (op != '*' && op != '/')
+    {
+      return (true, value);
+    }
+
+    advanceChar();
+    skipWhitespace();
+    (success, long nextValue) = parseInt();
+    if (!success)
+      return (false, 0);
+    
+    if (op == '*')
+    {
+      value *= nextValue;
+    }
+    else
+    {
+      if (nextValue == 0)
+      {
+        Console.WriteLine(
+          string.Format(
+            "Error at {0}: Division by zero", opPosition
+          )
+        );
+        return (false, 0);
+      }
+      value /= nextValue;
+    }
+  }
+
+  return (true, value);
+}
+
