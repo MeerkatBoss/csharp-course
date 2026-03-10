@@ -24,8 +24,6 @@ string text = "";
       builder.Clear();
     }
   }
-
-  Console.WriteLine(builder.ToString());
 }
 
 void evaluate(string expression)
