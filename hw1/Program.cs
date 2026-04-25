@@ -15,6 +15,12 @@ while (true)
 
         tokenizer = maybeTokenizer;
     }
+    catch (CharsAfterTerminatorException e)
+    {
+        Console.WriteLine("Invalid expression!");
+        Console.WriteLine(e.Message);
+        continue;
+    }
     catch (UnterminatedExpressionException e)
     {
         Console.WriteLine("Invalid expression!");
@@ -36,10 +42,10 @@ while (true)
         Console.WriteLine(e.Message);
     }
     catch (Exception e) when (
-      e is InvalidCharacterException ||
-      e is InvalidNumberException ||
-      e is ExpressionEndedException ||
-      e is UnexpectedTokenException
+      e is InvalidCharacterException
+        or InvalidNumberException
+        or ExpressionEndedException
+        or UnexpectedTokenException
     )
     {
         Console.WriteLine("Invalid expression!");

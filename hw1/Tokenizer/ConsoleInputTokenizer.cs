@@ -38,6 +38,12 @@ public class ConsoleInputTokenizer : ITokenizer
         }
 
         string text = input.ToString();
+        
+        int firstTerminator = text.IndexOf(ExpressionTerminator);
+        if (!text.AsSpan(firstTerminator + 1).IsWhiteSpace())
+        {
+            throw new CharsAfterTerminatorException(text[(firstTerminator + 1)..].TrimEnd());
+        }
 
         if (completed)
         {
