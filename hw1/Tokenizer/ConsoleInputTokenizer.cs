@@ -20,6 +20,7 @@ public class ConsoleInputTokenizer : ITokenizer
     public static ConsoleInputTokenizer? ReadFromConsole()
     {
         var input = new StringBuilder();
+        bool completed = false;
         while (true)
         {
             var line = Console.ReadLine()?.TrimEnd();
@@ -31,13 +32,14 @@ public class ConsoleInputTokenizer : ITokenizer
 
             if (line.EndsWith(ExpressionTerminator))
             {
+                completed = true;
                 break;
             }
         }
 
-        string text = input.ToString().TrimEnd();
+        string text = input.ToString();
 
-        if (text.EndsWith(ExpressionTerminator))
+        if (completed)
         {
             return new ConsoleInputTokenizer(text);
         }
