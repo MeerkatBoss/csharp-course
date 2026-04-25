@@ -17,29 +17,38 @@ public class ConsoleInputTokenizer : ITokenizer
     _column = 1;
   }
 
-  public static ConsoleInputTokenizer ReadFromConsole()
+  public static ConsoleInputTokenizer? ReadFromConsole()
   {
     var input = new StringBuilder();
     while (true)
     {
-      var line = Console.ReadLine();
+      var line = Console.ReadLine()?.TrimEnd();
       if (line == null)
       {
         break;
       }
       input.AppendLine(line);
-      if (IsExpressionReady(input))
+
+      if (line.EndsWith(ExpressionTerminator))
       {
         break;
       }
     }
 
-    if (!IsExpressionReady(input))
-    {
-      throw new UnterminatedExpressionException(input.ToString());
-    }
+    string text = input.ToString().TrimEnd();
 
-    return new ConsoleInputTokenizer(input.ToString());
+    if (text.EndsWith(ExpressionTerminator))
+    {
+      return new ConsoleInputTokenizer(text);
+    }
+    else if (text.IsWhiteSpace())
+    {
+      return null;
+    }
+    else
+    {
+      throw new UnterminatedExpressionException(text);
+    }
   }
 
   public Token? GetNextToken()
@@ -113,22 +122,5 @@ public class ConsoleInputTokenizer : ITokenizer
 
   private static readonly char ExpressionTerminator = '=';
   private static readonly char NewLine = '\n';
-
-  private static bool IsExpressionReady(StringBuilder builder)
-  {
-    for (int i = builder.Length - 1; i >= 0; --i)
-    {
-      if (builder[i] == ExpressionTerminator)
-      {
-        return true;
-      }
-      else if (!char.IsWhiteSpace(builder[i]))
-      {
-        return false;
-      }
-    }
-    return false;
-  }
-
   private static bool IsNumberChar(char ch) => char.IsDigit(ch) || ch == '.';
 }
