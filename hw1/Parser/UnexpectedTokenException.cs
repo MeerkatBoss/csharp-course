@@ -6,7 +6,7 @@ public class UnexpectedTokenException(
   Token token,
   TokenType expected
 ) : Exception(
-  $"{token.Line}:{token.Column} - Expected {expected.GetRepresentation()} but found '{token.Value}'"
+  $"Error at {token.Line}:{token.Column} - Expected {expected.GetRepresentation()} but found '{token.Value}'"
 )
 {
     public Token Token { get; } = token;
