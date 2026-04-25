@@ -115,13 +115,5 @@ public class RecursiveDescentParser : IParser
         return _tokenizer.GetNextToken();
     }
 
-    private Token? PeekNextToken()
-    {
-        if (_nextToken != null)
-        {
-            return _nextToken;
-        }
-        _nextToken = _tokenizer.GetNextToken();
-        return _nextToken;
-    }
+    private Token? PeekNextToken() => _nextToken ??= _tokenizer.GetNextToken();
 }
