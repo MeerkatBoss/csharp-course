@@ -15,7 +15,7 @@ using hw1.Tokenizer;
 public class RecursiveDescentParser : IParser
 {
     private readonly ITokenizer _tokenizer;
-    private Token? _lastToken;
+    private Token? _nextToken;
 
     public RecursiveDescentParser(ITokenizer tokenizer)
     {
@@ -106,10 +106,10 @@ public class RecursiveDescentParser : IParser
 
     private Token? GetNextToken()
     {
-        if (_lastToken != null)
+        if (_nextToken != null)
         {
-            Token? token = _lastToken;
-            _lastToken = null;
+            Token? token = _nextToken;
+            _nextToken = null;
             return token;
         }
         return _tokenizer.GetNextToken();
@@ -117,11 +117,11 @@ public class RecursiveDescentParser : IParser
 
     private Token? PeekNextToken()
     {
-        if (_lastToken != null)
+        if (_nextToken != null)
         {
-            return _lastToken;
+            return _nextToken;
         }
-        _lastToken = _tokenizer.GetNextToken();
-        return _lastToken;
+        _nextToken = _tokenizer.GetNextToken();
+        return _nextToken;
     }
 }
