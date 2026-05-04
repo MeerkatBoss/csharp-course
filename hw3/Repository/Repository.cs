@@ -33,8 +33,8 @@ public class Repository<T> where T : IEntity
         }
     }
 
-    public IReadOnlyList<T> Find(Predicate<T> predicate) => Filter(predicate).ToImmutableList();
+    public List<T> Find(Predicate<T> predicate) => Filter(predicate).ToList();
 
-    public IReadOnlyList<T> GetAll() => All.ToImmutableList();
+    public List<T> GetAll() => All.ToList();
 
 }
