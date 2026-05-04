@@ -176,7 +176,7 @@ public class RepositoryTests
         for (int n = 0; n < 10; ++n)
         {
             MockItem item = new(n, 40 + n);
-            
+
             if (predicate(item))
             {
                 Assert.That(items, Does.Contain(item));

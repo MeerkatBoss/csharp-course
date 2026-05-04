@@ -59,7 +59,7 @@ class CollectionUtilsTests
     [Test]
     public void Distinct_HasDuplicates_ReturnDistinct()
     {
-        List<int> items = [1, 2, 3, 1, 3, 3, 4, 2, 2 ,5, 4, 5, 5];
+        List<int> items = [1, 2, 3, 1, 3, 3, 4, 2, 2, 5, 4, 5, 5];
         List<int> expected = [1, 2, 3, 4, 5];
         List<int> distinct = CollectionUtils.Distinct(items);
         Assert.AreEqual(expected, distinct);
@@ -196,7 +196,7 @@ class CollectionUtilsTests
         };
         Dictionary<int, string> second = new()
         {
-            {1, "a"}, 
+            {1, "a"},
             {3, "c"},
             {4, "d"}
         };
