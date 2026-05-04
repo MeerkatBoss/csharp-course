@@ -44,15 +44,15 @@ public static class CollectionUtils
     {
         Dictionary<TKey, TValue> result = new(first);
 
-        foreach (var (key, value) in second)
+        foreach (var (key, secondValue) in second)
         {
-            if (result.TryGetValue(key, out var duplicate))
+            if (result.TryGetValue(key, out var firstValue))
             {
-                result[key] = conflictResolver(value, duplicate);
+                result[key] = conflictResolver(firstValue, secondValue);
             }
             else
             {
-                result.Add(key, value);
+                result.Add(key, secondValue);
             }
         }
 
