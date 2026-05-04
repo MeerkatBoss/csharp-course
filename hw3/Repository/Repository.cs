@@ -4,37 +4,37 @@ namespace hw3.Repository;
 
 public class Repository<T> where T : IEntity
 {
-  private readonly Dictionary<int, T> storage = [];
+    private readonly Dictionary<int, T> storage = [];
 
-  public IEnumerable<T> All { get => storage.Values; }
+    public IEnumerable<T> All { get => storage.Values; }
 
-  public int Count { get => storage.Count; }
+    public int Count { get => storage.Count; }
 
-  public void Add(T value)
-  {
-    if (!storage.TryAdd(value.Id, value))
+    public void Add(T value)
     {
-      throw new InvalidOperationException($"Cannot add duplicate key {value.Id}");
+        if (!storage.TryAdd(value.Id, value))
+        {
+            throw new InvalidOperationException($"Cannot add duplicate key {value.Id}");
+        }
     }
-  }
 
-  public bool Remove(int id) => storage.Remove(id);
+    public bool Remove(int id) => storage.Remove(id);
 
-  public T? GetById(int id) => storage.GetValueOrDefault(id);
+    public T? GetById(int id) => storage.GetValueOrDefault(id);
 
-  public IEnumerable<T> Filter(Predicate<T> predicate)
-  {
-    foreach (T item in All)
+    public IEnumerable<T> Filter(Predicate<T> predicate)
     {
-      if (predicate(item))
-      {
-        yield return item;
-      }
+        foreach (T item in All)
+        {
+            if (predicate(item))
+            {
+                yield return item;
+            }
+        }
     }
-  }
 
-  public IReadOnlyList<T> Find(Predicate<T> predicate) => Filter(predicate).ToImmutableList();
+    public IReadOnlyList<T> Find(Predicate<T> predicate) => Filter(predicate).ToImmutableList();
 
-  public IReadOnlyList<T> GetAll() => All.ToImmutableList();
+    public IReadOnlyList<T> GetAll() => All.ToImmutableList();
 
 }
